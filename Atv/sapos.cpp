@@ -84,6 +84,7 @@ int main() {
 
     // Determinação do vencedor
     if (sapo1.chegouAoFim() && sapo2.chegouAoFim()) {
+        //se os dois passarem a linha de chegada no mesmo pulo dá empate, independente de se um pulou mais que o outro
         std::cout << "Empate!" << std::endl;
         sapo1.incrementarEmpate();
         sapo2.incrementarEmpate();
