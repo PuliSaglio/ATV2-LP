@@ -1,95 +1,150 @@
 #include <iostream>
-#include <cmath>
+using namespace std;
 
-// Classe base abstrata para Figuras Geométricas Espaciais
-class FiguraEspacial {
-public:
-    virtual double calcularArea() const = 0;
-    virtual double calcularVolume() const = 0;
-    virtual ~FiguraEspacial() {}
+//uso de polimorfismo na classe geometria_espacial atraves do virtual
+class geometria_espacial{
+    protected:
+        double area_base;
+        double area_lateral;
+        double aresta1;
+        double aresta2;
+        double aresta3;
+        double altura;
+        double pi = 3.14;
+        double r;
+
+    public:
+       virtual void set()=0;
+       virtual double area()=0;
+       virtual double volume()=0;
+
 };
 
-// Classe para Pirâmide
-class Piramide : public FiguraEspacial {
-    double base, altura, arestaBase;
-public:
-    Piramide(double b, double h, double a) : base(b), altura(h), arestaBase(a) {}
+// classes separadas para cada figura geometrica, pois assim conseguimos passar apenas os valores necessarios para o calculo 
+class piramide: public geometria_espacial{
+    public:
+     void set(){
+        cout<<"Digite o valor da aresta da base:";
+        cin >> aresta1;
+        cout<<"Digite a altura:";
+        cin >> altura;
+        area_base = aresta1 * aresta1;
+        area_lateral = (aresta1 * altura)/2;
 
-    double calcularArea() const override {
-        double apotema = std::sqrt((altura * altura) + ((arestaBase / 2) * (arestaBase / 2)));
-        return (base * base) + 2 * base * apotema;
+     }
+
+    double area(){
+        return area_base + (4 * area_lateral);
+
     }
 
-    double calcularVolume() const override {
-        return (base * base * altura) / 3;
-    }
-};
-
-// Classe para Cubo
-class Cubo : public FiguraEspacial {
-    double aresta;
-public:
-    Cubo(double a) : aresta(a) {}
-
-    double calcularArea() const override {
-        return 6 * aresta * aresta;
-    }
-
-    double calcularVolume() const override {
-        return std::pow(aresta, 3);
+    double volume(){
+        return (1.0/3) * area_base * altura;
     }
 };
 
-// Classe para Paralelepípedo
-class Paralelepipedo : public FiguraEspacial {
-    double aresta1, aresta2, aresta3;
-public:
-    Paralelepipedo(double a1, double a2, double a3) : aresta1(a1), aresta2(a2), aresta3(a3) {}
+class cubo: public geometria_espacial{
+    public:
+    void set(){
+        cout<<"Digite o valor da base:";
+        cin>> aresta1;
+    }   
 
-    double calcularArea() const override {
-        return 2 * (aresta1 * aresta2 + aresta1 * aresta3 + aresta2 * aresta3);
+    double area(){
+        return 6*(aresta1 * aresta1);
+
     }
 
-    double calcularVolume() const override {
+    double volume(){
+        return aresta1 * aresta1 * aresta1;
+
+    }
+};
+
+class paralelepipedo: public geometria_espacial{
+    public:
+    void set(){
+        cout<<"Digite o valor da base:";
+        cin>> aresta1;
+        cout<<"Digite o valor da altura:";
+        cin>> aresta2;
+        cout<<"Digite o valor da largura:";
+        cin>> aresta3;
+    } 
+    double area(){
+        return (2* aresta1 * aresta2)+ (2 * aresta2 * aresta3) + (2 * aresta3 * aresta1);
+
+    }
+
+    double volume(){
         return aresta1 * aresta2 * aresta3;
     }
 };
 
-// Classe para Esfera
-class Esfera : public FiguraEspacial {
-    double raio;
-public:
-    Esfera(double r) : raio(r) {}
+class esfera: public geometria_espacial{
+    public:
+    void set(){
+        cout<<"Digite o valor do raio:";
+        cin>> r;
+    }
+    double area(){
+        return 4 * pi * (r*r);
 
-    double calcularArea() const override {
-        return 4 * M_PI * raio * raio;
     }
 
-    double calcularVolume() const override {
-        return (4.0 / 3.0) * M_PI * std::pow(raio, 3);
+    double volume(){
+        return (4.0/3) * pi * (r*r*r);
     }
 };
 
-int main() {
-    FiguraEspacial* figuras[4];
+int main()
+{
+    int num;
+    geometria_espacial* figura = nullptr;
+
+    //ponteiro de função para as classes criadas
+    double (geometria_espacial::*func_area)() = &geometria_espacial::area;
+    double (geometria_espacial::*func_volume)() = &geometria_espacial::volume;
+
+    //laço de repetição para que o usario possa repetir quantas vezes quiser.
+    do{
+    std::cout<<"Escolha a figura geometrica:\n";
+    std::cout<<"1 - Piramide\n";
+    std::cout<<"2 - Cubo\n";
+    std::cout<<"3 - Paralelepipedo\n";
+    std::cout<<"4 - Esfera\n";
+     
+    std::cin >> num;
+
+    //uso do switch case para que o usuario possa escolher qual figura geometrica quer calcular
+    switch (num){
+    case 1:
+        figura = new piramide();
+        break;
     
-    // Criando os objetos
-    figuras[0] = new Piramide(3, 4, 5); // Base = 3, Altura = 4, Aresta da Base = 5
-    figuras[1] = new Cubo(3);           // Aresta = 3
-    figuras[2] = new Paralelepipedo(3, 4, 5); // Arestas = 3, 4, 5
-    figuras[3] = new Esfera(3);         // Raio = 3
+    case 2:
+        figura = new cubo();
+        break;
+        
+    case 3:
+        figura = new paralelepipedo();
+        break;
     
-    // Calculando e exibindo as áreas e volumes
-    for (int i = 0; i < 4; i++) {
-        std::cout << "Figura " << i + 1 << ":\n";
-        std::cout << "Área: " << figuras[i]->calcularArea() << "\n";
-        std::cout << "Volume: " << figuras[i]->calcularVolume() << "\n\n";
+    case 4:
+        figura = new esfera();
+        break;
+
+    default:
+        cout<<" Escolha inválida\n";
+        break;
     }
 
-    // Limpando a memória
-    for (int i = 0; i < 4; i++) {
-        delete figuras[i];
-    }
+        figura -> set();
+        cout<<" Area:" << (figura->*func_area)() << endl;
+        cout<<" volume: " << (figura->*func_volume)() << endl;
+        delete figura; 
 
+    } while(num != 0);
+    
     return 0;
 }
